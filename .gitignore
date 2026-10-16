@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vector database & storage
+chroma/
+*.chroma
+backup/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# IDEs, editors & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Build & distribution
+build/
+dist/
+*.egg-info/
+
+# Logs & scratch files
+*.log
+scratch/

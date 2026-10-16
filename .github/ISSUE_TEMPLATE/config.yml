@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Community Discussions
+    url: https://github.com/Chaitanya1825/DocuMind-RAG/discussions
+    about: Ask questions, share ideas, and discuss RAG architectures or prompt engineering.
+  - name: 📖 Project Documentation
+    url: https://github.com/Chaitanya1825/DocuMind-RAG#readme
+    about: Read setup instructions, CLI guides, and embedding model options.

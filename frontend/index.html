@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuMind-RAG — Document Intelligence Assistant</title>
+  <meta name="description"
+    content="DocuMind-RAG: Enterprise Document Intelligence Assistant and RAG Exploration Studio. Grounded in PDF knowledge bases with citation tracking." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="theme-dark">
+  <div class="app-layout">
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="appSidebar" aria-label="Main Navigation">
+      <!-- App Brand / Header -->
+      <div class="sidebar-header">
+        <div class="brand-container">
+          <div class="brand-icon-wrapper">
+            <svg class="brand-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#brandGrad)" />
+              <defs>
+                <linearGradient id="brandGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366f1" />
+                  <stop offset="1" stop-color="#a855f7" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="brand-glow"></span>
+          </div>
+          <div class="brand-info">
+            <h1 class="brand-title">DocuMind-<span>RAG</span></h1>
+            <p class="brand-subtitle">Document Intelligence</p>
+          </div>
+        </div>
+
+        <!-- Mobile close button -->
+        <button class="icon-btn mobile-sidebar-close" id="mobileSidebarCloseBtn" aria-label="Close Navigation Sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <span class="badge badge-demo">UI DEMO</span>
+      </div>
+
+      <!-- Quick Action: New Chat -->
+      <div class="sidebar-action">
+        <button class="btn btn-primary btn-new-chat" id="btnNewChat" aria-label="Start a new chat conversation">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Chat</span>
+          <kbd class="shortcut-pill" title="Press Ctrl+K on your keyboard">Ctrl+K</kbd>
+        </button>
+      </div>
+
+      <!-- Navigation Views -->
+      <nav class="sidebar-nav" aria-label="View Switcher">
+        <button class="nav-item active" data-view="chat" id="navChat" aria-label="Switch to RAG Chat View">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span class="nav-label">RAG Chat</span>
+          <span class="nav-indicator"></span>
+        </button>
+
+        <button class="nav-item" data-view="documents" id="navDocuments" aria-label="Switch to Document Library View">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="nav-label">Document Library</span>
+          <span class="badge badge-subtle" id="navDocCount">3</span>
+        </button>
+
+        <button class="nav-item" data-view="settings" id="navSettings" aria-label="Switch to Settings View">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          <span class="nav-label">Settings</span>
+        </button>
+      </nav>
+
+      <!-- Recent Conversations History -->
+      <div class="sidebar-history">
+        <div class="history-header">
+          <span class="history-title">Sample Conversations</span>
+          <span class="history-hint">Demo</span>
+        </div>
+        <ul class="history-list" id="historyList" aria-label="Conversation History List">
+          <li class="history-item active" data-conv-id="monopoly-rules" tabindex="0" role="button"
+            aria-label="Select Monopoly Starting Bankroll conversation">
+            <svg class="history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="history-text" title="Monopoly Starting Bankroll">Monopoly Starting Bankroll</span>
+            <span class="history-badge">monopoly.pdf</span>
+          </li>
+          <li class="history-item" data-conv-id="ticket-to-ride" tabindex="0" role="button"
+            aria-label="Select Longest Continuous Path conversation">
+            <svg class="history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="history-text" title="Longest Continuous Path">Longest Continuous Path</span>
+            <span class="history-badge">ticket.pdf</span>
+          </li>
+          <li class="history-item" data-conv-id="bankruptcy-rules" tabindex="0" role="button"
+            aria-label="Select Bankruptcy & Mortgages conversation">
+            <svg class="history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="history-text" title="Bankruptcy & Mortgages">Bankruptcy & Mortgages</span>
+            <span class="history-badge">monopoly.pdf</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Sidebar Footer Status -->
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-indicator-row">
+            <span class="status-dot status-online"></span>
+            <span class="status-label">ChromaDB Vector Store</span>
+            <span class="status-tag">Local</span>
+          </div>
+          <div class="status-meta">
+            <span id="footerChunkMeta">2 PDFs • 60 Chunks</span>
+            <span class="status-model" id="footerModelMeta">Mistral 7B (Local)</span>
+          </div>
+        </div>
+        <div class="demo-disclaimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="demo-icon"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>UI Showcase Mode • Grounded sample data</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="main-workspace">
+      <!-- Top Navigation Bar -->
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Navigation Sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="breadcrumb" aria-label="Breadcrumb Trail">
+            <span class="breadcrumb-root">DocuMind</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current" id="breadcrumbTitle">Chat Assistant</span>
+          </div>
+        </div>
+
+        <div class="navbar-right">
+          <!-- Active Model Selector Pill (Interactive Link to Settings) -->
+          <button class="model-pill" id="modelSelectorPill" title="Click to open model configuration settings"
+            aria-label="Configured model: Mistral 7B (Ollama)">
+            <span class="model-badge">LLM</span>
+            <span class="model-name" id="navbarModelLabel">Mistral 7B (Ollama • Demo)</span>
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Toggle Right Sources Panel Button -->
+          <button class="btn btn-secondary btn-toggle-sources active" id="btnToggleSources"
+            title="Toggle Retrieved Sources Panel" aria-expanded="true" aria-controls="sourcesPanel">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+            <span>Sources</span>
+            <span class="badge badge-accent" id="sourceCountBadge">3</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT PANELS -->
+      <div class="content-body">
+
+        <!-- ============================================== -->
+        <!-- VIEW 1: CHAT INTERFACE                         -->
+        <!-- ============================================== -->
+        <section class="view-panel active" id="viewChat" role="region" aria-label="Chat Conversation">
+          <div class="chat-container">
+            <!-- Chat Scroll Area -->
+            <div class="chat-messages" id="chatMessages" tabindex="0" aria-label="Message stream">
+
+              <!-- Welcome State Hero (Visible on Empty / New Chat) -->
+              <div class="welcome-hero" id="welcomeHero">
+                <div class="hero-badge">
+                  <span class="hero-badge-dot"></span>
+                  <span>RAG Knowledge Retrieval Studio</span>
+                </div>
+                <h2 class="hero-title">Welcome to <span>DocuMind-RAG</span></h2>
+                <p class="hero-description">
+                  Query your indexed PDF documents in natural language. Powered by local vector search and LLM
+                  contextual synthesis with exact page citations.
+                </p>
+
+                <!-- Demo Notice Card -->
+                <div class="demo-banner-box">
+                  <div class="demo-banner-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 16v-4"></path>
+                      <path d="M12 8h.01"></path>
+                    </svg>
+                  </div>
+                  <div class="demo-banner-content">
+                    <h4>Demo Interface Mode</h4>
+                    <p>
+                      This interface visualizes your RAG pipeline. Responses and citations below illustrate the exact
+                      rules from your repository's <code>monopoly.pdf</code> and <code>ticket_to_ride.pdf</code>
+                      documents. No live backend commands or network calls are active.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Suggested Questions Section -->
+                <div class="suggested-queries">
+                  <div class="suggested-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="suggested-icon"
+                      aria-hidden="true">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    <span>Suggested questions from indexed documents:</span>
+                  </div>
+                  <div class="suggestion-grid">
+                    <button class="suggestion-card"
+                      data-prompt="How much total money does a player start with in Monopoly?">
+                      <div class="suggestion-tag">monopoly.pdf</div>
+                      <p class="suggestion-question">"How much total money does a player start with in Monopoly?"</p>
+                      <span class="suggestion-action">Ask question &rarr;</span>
+                    </button>
+
+                    <button class="suggestion-card"
+                      data-prompt="How many points does the longest continuous train route get in Ticket to Ride?">
+                      <div class="suggestion-tag">ticket_to_ride.pdf</div>
+                      <p class="suggestion-question">"How many points does the longest continuous train route get?"</p>
+                      <span class="suggestion-action">Ask question &rarr;</span>
+                    </button>
+
+                    <button class="suggestion-card"
+                      data-prompt="What happens if a player rolls doubles three times in a row in Monopoly?">
+                      <div class="suggestion-tag">monopoly.pdf</div>
+                      <p class="suggestion-question">"What happens if a player rolls doubles three times in a row?"</p>
+                      <span class="suggestion-action">Ask question &rarr;</span>
+                    </button>
+
+                    <button class="suggestion-card"
+                      data-prompt="How are incomplete Destination Tickets scored at the end of Ticket to Ride?">
+                      <div class="suggestion-tag">ticket_to_ride.pdf</div>
+                      <p class="suggestion-question">"How are incomplete Destination Tickets scored at game end?"</p>
+                      <span class="suggestion-action">Ask question &rarr;</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message History (Rendered dynamically based on active conversation) -->
+              <div class="message-thread" id="messageThread">
+                <!-- Injected by JavaScript -->
+              </div>
+
+              <!-- Typing / Loading Indicator (Hidden by default) -->
+              <div class="message message-assistant typing-indicator-wrapper" id="typingIndicator"
+                style="display: none;" aria-live="polite">
+                <div class="message-avatar">
+                  <div class="ai-avatar-glow"></div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
+                  </svg>
+                </div>
+                <div class="message-content">
+                  <div class="typing-bubble">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-text">Simulating Chroma vector search & Mistral 7B inference...</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Message Composer Bar -->
+            <div class="composer-container">
+              <div class="composer-card">
+                <div class="composer-input-row">
+                  <button class="composer-btn" id="btnAttachDoc" title="Attach document (Demo UI affordance)"
+                    aria-label="Attach document">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path
+                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                      </path>
+                    </svg>
+                  </button>
+
+                  <textarea id="chatInput" class="composer-textarea"
+                    placeholder="Ask a question about your indexed documents... (e.g. How does bankruptcy work in Monopoly?)"
+                    rows="1" aria-label="Ask a question about your indexed documents"></textarea>
+
+                  <button class="btn btn-send" id="btnSendMessage"
+                    title="Send message (Simulated local RAG interaction)" aria-label="Send query">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="composer-footer">
+                  <div class="composer-hints">
+                    <span class="badge badge-ghost" id="composerTopKPill">k = 5 chunks</span>
+                    <span class="composer-hint-text">Grounded on: <code>data/monopoly.pdf</code>,
+                      <code>data/ticket_to_ride.pdf</code></span>
+                  </div>
+                  <div class="composer-notice">
+                    <span>DocuMind Demo &bull; Local UI Simulation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: DOCUMENT LIBRARY                       -->
+        <!-- ============================================== -->
+        <section class="view-panel" id="viewDocuments" role="region" aria-label="Document Library">
+          <div class="documents-container">
+            <!-- Documents Header -->
+            <div class="view-header">
+              <div>
+                <h2 class="view-title">Document Library</h2>
+                <p class="view-subtitle">Browse and manage the PDF documents loaded into the local Chroma vector
+                  database.</p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-primary" id="btnUploadDocDemo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Upload Document</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Documents Search & Filters -->
+            <div class="library-filter-bar">
+              <div class="search-input-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"
+                  aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="docSearchInput" placeholder="Search documents by name, category, or status..."
+                  aria-label="Search documents" />
+              </div>
+
+              <div class="filter-pills" id="docCategoryFilters" role="group" aria-label="Filter documents by category">
+                <button class="pill-btn active" data-category="all">All (3)</button>
+                <button class="pill-btn" data-category="rulebooks">Rulebooks (2)</button>
+                <button class="pill-btn" data-category="indexed">Indexed (2)</button>
+                <button class="pill-btn" data-category="drafts">Pending (1)</button>
+              </div>
+            </div>
+
+            <!-- Empty Search State -->
+            <div class="empty-docs-state" id="emptyDocsState" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <h3>No matching documents</h3>
+              <p id="emptyDocsMsg">No documents match your filter. Try adjusting your search term.</p>
+              <button class="btn btn-secondary btn-sm" id="btnResetDocFilters">Reset Filters</button>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="documents-grid" id="documentsGrid">
+              <!-- Document 1: monopoly.pdf -->
+              <div class="doc-card" data-doc-name="monopoly.pdf" data-category="rulebooks indexed">
+                <div class="doc-card-header">
+                  <div class="doc-icon-badge pdf-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <path d="M9 13v4"></path>
+                      <path d="M12 13v4"></path>
+                      <path d="M15 13v4"></path>
+                    </svg>
+                  </div>
+                  <div class="doc-status-badge status-indexed">
+                    <span class="status-dot"></span>
+                    <span>Indexed</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-body">
+                  <h3 class="doc-title">monopoly.pdf</h3>
+                  <p class="doc-path"><code>data/monopoly.pdf</code></p>
+                  <p class="doc-desc">Official Monopoly board game rulebook, including setup, starting bankroll,
+                    properties, and bankruptcy rules.</p>
+                </div>
+
+                <div class="doc-metrics-row">
+                  <div class="metric-item">
+                    <span class="metric-label">File Size</span>
+                    <span class="metric-val">611 KB</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Chunks</span>
+                    <span class="metric-val">18 Chunks</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Chunk Size</span>
+                    <span class="metric-val">800 chars</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-footer">
+                  <button class="btn btn-secondary btn-sm inspect-doc-btn" data-doc="monopoly">
+                    <span>Inspect Chunks</span>
+                  </button>
+                  <button class="btn btn-ghost btn-sm query-doc-btn"
+                    data-query="How much total money does a player start with in Monopoly?">
+                    <span>Query Doc</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Document 2: ticket_to_ride.pdf -->
+              <div class="doc-card" data-doc-name="ticket_to_ride.pdf" data-category="rulebooks indexed">
+                <div class="doc-card-header">
+                  <div class="doc-icon-badge pdf-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <path d="M9 13v4"></path>
+                      <path d="M12 13v4"></path>
+                      <path d="M15 13v4"></path>
+                    </svg>
+                  </div>
+                  <div class="doc-status-badge status-indexed">
+                    <span class="status-dot"></span>
+                    <span>Indexed</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-body">
+                  <h3 class="doc-title">ticket_to_ride.pdf</h3>
+                  <p class="doc-path"><code>data/ticket_to_ride.pdf</code></p>
+                  <p class="doc-desc">Official Ticket to Ride rulebook covering board routes, train car cards,
+                    destination tickets, and scoring bonuses.</p>
+                </div>
+
+                <div class="doc-metrics-row">
+                  <div class="metric-item">
+                    <span class="metric-label">File Size</span>
+                    <span class="metric-val">3.48 MB</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Chunks</span>
+                    <span class="metric-val">42 Chunks</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Chunk Size</span>
+                    <span class="metric-val">800 chars</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-footer">
+                  <button class="btn btn-secondary btn-sm inspect-doc-btn" data-doc="ticket">
+                    <span>Inspect Chunks</span>
+                  </button>
+                  <button class="btn btn-ghost btn-sm query-doc-btn"
+                    data-query="How many points does the longest continuous train route get in Ticket to Ride?">
+                    <span>Query Doc</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Document 3: supplemental_rules.pdf (Demo Pending Document) -->
+              <div class="doc-card" data-doc-name="supplemental_rules.pdf" data-category="drafts">
+                <div class="doc-card-header">
+                  <div class="doc-icon-badge pdf-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <path d="M9 13v4"></path>
+                      <path d="M12 13v4"></path>
+                      <path d="M15 13v4"></path>
+                    </svg>
+                  </div>
+                  <div class="doc-status-badge status-pending">
+                    <span class="status-dot dot-amber"></span>
+                    <span>Pending Indexing</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-body">
+                  <h3 class="doc-title">supplemental_rules.pdf</h3>
+                  <p class="doc-path"><code>data/drafts/supplemental_rules.pdf</code></p>
+                  <p class="doc-desc">Tournament house rules supplement and tie-breaker guidelines. Ready to be added to
+                    vector database.</p>
+                </div>
+
+                <div class="doc-metrics-row">
+                  <div class="metric-item">
+                    <span class="metric-label">File Size</span>
+                    <span class="metric-val">185 KB</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Chunks</span>
+                    <span class="metric-val">0 Chunks</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Target Chunk</span>
+                    <span class="metric-val">800 chars</span>
+                  </div>
+                </div>
+
+                <div class="doc-card-footer">
+                  <button class="btn btn-secondary btn-sm inspect-doc-btn" data-doc="supplemental">
+                    <span>Inspect Chunks</span>
+                  </button>
+                  <button class="btn btn-ghost btn-sm query-doc-btn"
+                    data-query="What are the tournament tie-breaker guidelines?">
+                    <span>Query Doc</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Drag & Drop Upload Affordance Area -->
+            <div class="dropzone-box" id="dropzoneBox" tabindex="0" role="button"
+              aria-label="Upload PDF files dropzone">
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <h4>Drag and drop new PDF files to index</h4>
+              <p>Supports .pdf documents. New uploads will appear in the library preview.</p>
+              <button class="btn btn-secondary btn-sm" id="btnSelectFiles">Browse Local Files</button>
+              <input type="file" id="hiddenFileInput" accept=".pdf" style="display: none;" />
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 3: SETTINGS SCREEN                        -->
+        <!-- ============================================== -->
+        <section class="view-panel" id="viewSettings" role="region" aria-label="Settings and Preferences">
+          <div class="settings-container">
+            <div class="view-header">
+              <div>
+                <h2 class="view-title">Assistant & RAG Settings</h2>
+                <p class="view-subtitle">Configure model inference parameters, vector search depth, and UI preferences.
+                </p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-ghost" id="btnResetSettings" title="Reset settings to original defaults">
+                  <span>Reset Defaults</span>
+                </button>
+                <button class="btn btn-primary" id="btnSaveSettings"
+                  title="Save current settings to browser local storage">
+                  <span>Save Settings (Local)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Settings Sections -->
+            <div class="settings-grid">
+
+              <!-- Card 1: Appearance & Theme -->
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <div class="settings-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="settings-card-title">Appearance & Theme</h3>
+                    <p class="settings-card-subtitle">Customize visual theme and UI accent colors</p>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label">Theme Mode</label>
+                    <p class="setting-hint">DocuMind-RAG is optimized for dark mode environments</p>
+                  </div>
+                  <div class="theme-picker" role="radiogroup" aria-label="Theme mode selection">
+                    <button class="theme-option active" data-theme="dark" role="radio" aria-checked="true">Midnight
+                      Dark</button>
+                    <button class="theme-option" data-theme="slate" role="radio" aria-checked="false">Slate
+                      Obsidian</button>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label">Accent Highlight</label>
+                    <p class="setting-hint">Primary color used across buttons, citations, and badges</p>
+                  </div>
+                  <div class="accent-picker" role="radiogroup" aria-label="Accent color selection">
+                    <button class="color-dot active" data-color="indigo" style="background: #6366f1;"
+                      title="Indigo Glow" aria-label="Indigo Accent"></button>
+                    <button class="color-dot" data-color="purple" style="background: #a855f7;" title="Amethyst Purple"
+                      aria-label="Purple Accent"></button>
+                    <button class="color-dot" data-color="cyan" style="background: #06b6d4;" title="Cyan Tech"
+                      aria-label="Cyan Accent"></button>
+                    <button class="color-dot" data-color="emerald" style="background: #10b981;" title="Emerald Green"
+                      aria-label="Emerald Accent"></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: LLM Configuration -->
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <div class="settings-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="settings-card-title">LLM Model Provider</h3>
+                    <p class="settings-card-subtitle">Illustrative parameters reflecting <code>query_data.py</code></p>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label" for="settingModelProvider">Inference Engine</label>
+                    <p class="setting-hint">Backend provider configured in Python code</p>
+                  </div>
+                  <select id="settingModelProvider" class="form-select">
+                    <option value="ollama" selected>Ollama (Local Host: 11434)</option>
+                    <option value="bedrock">AWS Bedrock (Boto3)</option>
+                    <option value="openai">OpenAI Compatible API</option>
+                  </select>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label" for="settingModelName">Target Model</label>
+                    <p class="setting-hint">Model name invoked in <code>query_rag()</code></p>
+                  </div>
+                  <select id="settingModelName" class="form-select">
+                    <option value="mistral" selected>mistral (7B default)</option>
+                    <option value="llama3.2:3b">llama3.2:3b (Recommended for 8GB RAM)</option>
+                    <option value="phi3:mini">phi3:mini (Lightweight 3.8B)</option>
+                    <option value="llama3.2:1b">llama3.2:1b (Ultra-fast 1B)</option>
+                  </select>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label" for="settingTemperature">Temperature: <span
+                        id="tempValueDisplay">0.2</span></label>
+                    <p class="setting-hint">Lower temperature yields strictly factual document answers</p>
+                  </div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="settingTemperature" min="0" max="1" step="0.05" value="0.2"
+                      class="form-slider" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: RAG Retrieval Parameters -->
+              <div class="settings-card">
+                <div class="settings-card-header">
+                  <div class="settings-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="settings-card-title">Retrieval & Embedding Pipeline</h3>
+                    <p class="settings-card-subtitle">Vector database and chunking parameters</p>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label" for="settingEmbeddingFunc">Embedding Model</label>
+                    <p class="setting-hint">Function defined in <code>get_embedding_function.py</code></p>
+                  </div>
+                  <select id="settingEmbeddingFunc" class="form-select">
+                    <option value="nomic">Ollama (nomic-embed-text)</option>
+                    <option value="bedrock">AWS Bedrock (Titan Embeddings G1)</option>
+                  </select>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label" for="settingTopK">Top-K Chunks Retrieved: <span
+                        id="kValueDisplay">5</span></label>
+                    <p class="setting-hint">Matches <code>results = db.similarity_search_with_score(..., k=5)</code></p>
+                  </div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="settingTopK" min="1" max="10" step="1" value="5" class="form-slider" />
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <div>
+                    <label class="setting-label">ChromaDB Path</label>
+                    <p class="setting-hint">Local persist directory defined in <code>populate_database.py</code></p>
+                  </div>
+                  <div class="code-pill">
+                    <code>chroma/</code>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- RIGHT SOURCE PANEL (Toggleable Slide-out Panel) -->
+    <aside class="sources-panel open" id="sourcesPanel" role="region" aria-label="Retrieved Document Sources">
+      <div class="sources-panel-header">
+        <div class="sources-title-group">
+          <div class="sources-icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="sources-panel-title">Retrieved Sources</h3>
+            <span class="sources-sub">Simulated Vector Matches</span>
+          </div>
+        </div>
+        <button class="icon-btn" id="btnCloseSources" title="Close Sources Panel" aria-label="Close Sources Panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sources-disclaimer-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="disclaimer-icon"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Simulated chunks matching repository PDF text. Click any citation pill in chat to jump here.</span>
+      </div>
+
+      <!-- Sources List -->
+      <div class="sources-list" id="sourcesList" aria-label="Source chunks list">
+        <!-- Rendered dynamically by app.js based on active conversation -->
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION POPUP -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- INSPECT CHUNKS MODAL -->
+  <div class="modal-overlay" id="chunksModal" role="dialog" aria-modal="true" aria-labelledby="modalDocTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3 class="modal-title" id="modalDocTitle">Document Chunks Inspection</h3>
+          <span class="badge badge-accent" id="modalChunkCount">18 Chunks</span>
+        </div>
+        <button class="icon-btn modal-close-btn" id="btnCloseModal" aria-label="Close Chunk Inspection Modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalChunksContent">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <span class="modal-hint">Tip: Press <kbd>Esc</kbd> or click outside to dismiss</span>
+        <button class="btn btn-secondary btn-sm" id="btnFooterCloseModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
